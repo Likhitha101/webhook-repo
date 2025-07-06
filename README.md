@@ -8,15 +8,6 @@ Stores events in a local MongoDB database
 Shows timestamps in Indian Standard Time (IST)
 Automatically updates the frontend every 15 seconds
 Can be exposed to the internet using ngrok
-webhook-repo/
-├── templates/
-│   └── index.html           # Frontend UI template
-├── listening_to_webhook.py  # Flask server application
-├── .gitignore               # Specifies files/folders to exclude from Git
-├── README.md                # Project documentation and instructions
-└── screenshots/
-    └── webhook-ui.png       # Screenshot image of the frontend UI
-
 
 How to Run Locally
 Clone the repository:git clone https://github.com/YOUR_USERNAME/webhook-repo.git cd webhook-repo
