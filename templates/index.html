@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>GitHub Event Tracker</title>
+  <style>
+    body {
+      font-family: "Segoe UI", sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #f8f9fa;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: auto;
+      padding: 2rem;
+    }
+
+    h1 {
+      text-align: center;
+      color: #333;
+    }
+
+    .event {
+      background: white;
+      padding: 1rem;
+      margin-bottom: 1rem;
+      border-left: 6px solid #007bff;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .event.merge { border-left-color: #28a745; }
+    .event.pull_request { border-left-color: #ffc107; }
+    .event.push { border-left-color: #17a2b8; }
+
+    .timestamp {
+      font-size: 0.9rem;
+      color: #666;
+      margin-top: 0.5rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>GitHub Webhook Events</h1>
+    <div id="events"></div>
+  </div>
+
+  <script>
+    const shownEventIds = new Set();
+
+    async function fetchEvents() {
+      try {
+        const res = await fetch('/events');
+        const events = await res.json();
+        const container = document.getElementById('events');
+
+        events.reverse().forEach(e => {
+          if (shownEventIds.has(e._id)) return;
+          shownEventIds.add(e._id);
+
+          const author = e.author || 'Unknown';
+          const to_branch = e.to_branch || 'N/A';
+          const from_branch = e.from_branch || '';
+          const action = e.action;
+          const time = new Date(e.timestamp).toLocaleString();
+
+          let message = '';
+          if (action === 'push') {
+            message = `"${author}" pushed to "${to_branch}"`;
+          } else if (action === 'pull_request') {
+            message = `"${author}" opened a pull request from "${from_branch}" to "${to_branch}"`;
+          } else if (action === 'merge') {
+            message = `"${author}" merged "${from_branch}" into "${to_branch}"`;
+          }
+
+          const div = document.createElement('div');
+          div.className = `event ${action}`;
+          div.innerHTML = `<strong>${message}</strong><div class="timestamp">on ${time}</div>`;
+          container.insertBefore(div, container.firstChild);
+        });
+
+      } catch (err) {
+        console.error('Error fetching events:', err);
+      }
+    }
+
+    fetchEvents();
+    setInterval(fetchEvents, 15000);
+  </script>
+</body>
+</html>
